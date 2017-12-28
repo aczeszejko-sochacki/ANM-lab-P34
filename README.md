@@ -11,6 +11,8 @@ Konwersja obrazu na macierz:
 `Float64.(img)`.
 Konwersja macierzy na czarno-biały obraz:
 `colorview(Gray, mtx)`.
+Zmiana rozmiaru obrazu (funkcją biblioteczną):
+`imresize(img, (x, y))`.
 
 Więcej obrazków do testowania [tutaj](http://juliaimages.github.io/TestImages.jl/).
 
