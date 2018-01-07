@@ -28,34 +28,40 @@ function expand_using_linear_spline(img::Matrix, new_x::Int)
     old_y, old_x = size(img)
     new_img = Matrix{Float64}(old_y, new_x)
     
-    # Lagrange-style linear interpolation
-    lin_spline_val(x, x0, x1, y0, y1) = y0 * (x-x1)/(x0-x1) + y1 * (x-x0)/(x1-x0)
-    
-    for x = 1:new_x
-        # Creating entire columns at once for simplicity
-        new_img[:, x] = map(1:old_y) do y
-            p = 1 + (x-1)*(old_x-1) / (new_x-1)
-            x0 = Int(floor(p))
-            x1 = Int(ceil(p))
-            
-            # Guard to avoid zero division
-            if x0 == x1
-                img[y, Int(p)]
-            else
-                lin_spline_val(p, x0, x1, img[y, x0], img[y, x1])
-            end
-        end
+    for y = 1:old_y
+        x_values = collect(1:old_x)
+        y_values = img[y, :]
+        
+        spl = Spline1D(x, y, k=1)
+        
+        new_y_values = spl.(linspace(1, new_x, new_x))
+        new_y_values = map(x -> x > 255 ? 255 : x, a)
+        new_y_values = map(x -> x < 0 ? 0 : x, a)
+        
+        new_img[y, :] = new_y_values        
     end
     new_img
-end
+end;
 
 
 function expand_using_cubic_spline(img::Matrix, new_x::Int)
-    #
-    # TODO implement functionality
-    #
-    img
-end
+    old_y, old_x = size(img)
+    new_img = Matrix{Float64}(old_y, new_x)
+    
+    for y = 1:old_y
+        x_values = collect(1:old_x)
+        y_values = img[y, :]
+        
+        spl = Spline1D(x, y, k=3)
+        
+        new_y_values = spl.(linspace(1, new_x, new_x))
+        new_y_values = map(x -> x > 255 ? 255 : x, a)
+        new_y_values = map(x -> x < 0 ? 0 : x, a)
+        
+        new_img[y, :] = new_y_values        
+    end
+    new_img
+end;
 
 
 # MAIN FUNCTION
