@@ -25,11 +25,11 @@ end
 
 
 function expand_using_linear_spline(img::Matrix, new_x::Int)
-     old_y, old_x = size(img)
+    old_y, old_x = size(img)
     new_img = Matrix{Float64}(new_x, old_y)
     
     for y = 1:old_y
-        x_values = collect(1:old_x)
+        x_values = 1:old_x
         y_values = img[y, :]
         
         spl = Spline1D(x_values, y_values, k=1)
@@ -47,14 +47,14 @@ function expand_using_cubic_spline(img::Matrix, new_x::Int)
     new_img = Matrix{Float64}(new_x, old_y)
     
     for y = 1:old_y
-        x_values = collect(1:old_x)
+        x_values = 1:old_x
         y_values = img[y, :]
         
         spl = Spline1D(x_values, y_values, k=3)
         
         new_y_values = spl.(linspace(1, old_x, new_x))
-        new_y_values = map(x -> x > 255 ? 255 : x, new_y_values)
-        new_y_values = map(x -> x < 0 ? 0 : x, new_y_values)
+        new_y_values = map(x -> x > 1.0 ? 1.0 : x, new_y_values)
+        new_y_values = map(x -> x < 0.0 ? 0.0 : x, new_y_values)
         
         new_img[:, y] = new_y_values        
     end
