@@ -1,0 +1,95 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{polski}
+
+\title{Zwiększanie rozdzielczości bitmapy}
+\author{Sławomir Górawski\\ Aleksander Czeszejko-Sochacki}
+
+\begin{document}
+ \maketitle
+ \section{Wstęp}
+ Zarówno podczas powiększania obrazu, jak i zmiany jego
+ rozdzielczości pojawia się następujący problem: jaki odcień 
+ powinny mieć nowe piksele? Muszą być one, rzecz jasna, związane
+ z odcieniami pikseli z obrazu przed przetworzeniem. Do ich
+ ustalenia stosuje się rozmaite metody numeryczne. Pewnym z nich
+ przyjrzymy się poniżej.
+ 
+ \section{Cel wykonanych doświadczeń}
+ Aby móc określić, który sposób przekształcania obrazu jest
+ najlepszy, musielibyśmy znać pewne wskaźniki jakości zmiany
+ rozdzielczości. Zamiast tego przetestujemy trzy metody
+ i ocenimy je dwojako:
+ \begin{itemize}
+  \item Porównamy wizualnie, która metoda najlepiej
+  odzwieciedla obraz sprzed przekształcenia. Porównamy ostrość
+  krawędzi i stopień rozmycia obrazu.
+  \item Porównamy czasy działania wszystkich metod.
+  \item Sprawdzimy, czy kolejność skalowania (czy najpierw
+  w pionie, czy w poziomie) ma znaczenie.
+ \end{itemize}
+ 
+ \section{Opis użytych metod}
+  \begin{center}
+   \textbf{Dane: bitmapa o 256 odcieniach szarości o rozmiarze $N_x\times N_y$\\
+   Szukane: bitmapa o 256 odcieniach szarości o rozmiarze $M_x\times M_y$}\\
+  \end{center}
+  
+  przy czym $N_x < M_x$ i $N_y < M_y$.\\
+  
+  Przyjmijmy, że rozszerzanie obrazu odbywa się niezależnie
+  w pionie i w poziomie, to znaczy najpierw rozszerzamy obraz
+  w jednym, potem w drugim kierunku. Dodatkowo, użyte metody
+  ograniczają się do rozszerzania obrazów o rozmiarze Mx1, tzn.
+  wektora $[p_1, p_2, \dots, p_M]$. Cały wejściowy obraz można
+  potraktować jako sumę takich wektorów i każdy z nich 
+  niezależnie przeskalować.
+  
+  \newpage
+  Poniżej przyjmujemy $K(p_i)$ - wartość odcienia
+  w punkcie $p_i$.
+  
+  Użyte metody:
+  \begin{enumerate}
+   \item \textit{metoda najbliższego sąsiada}, wartość odcienia
+   piksela $p_i$:
+   \[K(p_i) = K(round(p_i)) (i = 1, 2,\dots, N)\]
+   co oznacza, że każdemu nowemu pikselowi przyporządkowujemy
+   odcień starego piksela o najbliższym indeksie.
+   
+   \item \textit{metoda bazująca na funkcji sklejanej pierwszego
+   stopnia}, konstruujemy taką funkcję sklejaną pierwszego stopnia
+   S, że:
+   \[S(t_i) = K(t_i) (i = 1, 2,\dots, M)\]
+   a następnie przyjmujemy:
+   \[K(p_i) = S(p_i)\]
+   
+   \item \textit{metoda bazująca na naturalnej funkcji sklejanej
+   trzeciego stopnia}, konstruujemy taką naturalną funkcję sklejaną
+   trzeciego stopnia Z, że:
+   \[Z(t_i) = K(t_i) (i = 1, 2,\dots, M)\]
+   a następnie przyjmujemy:
+   \[K(p_i) = Z(p_i)\]
+  \end{enumerate}
+  
+  Wszystkie wymienione metody zostały zaimplementowane w pliku
+  \texttt{program.jl}, w następujących funkcjach: 
+  \texttt{expand\_using\_nearest\_neighbours, 
+  expand\_using\_linear\_spline,
+  expand\_using\_cubic\_spline}\\
+  
+  \section{Testy}
+  
+  W pliku \texttt{program.ipynb} znajduja się obrazy, dla których
+  powyższe metody zostały przetestowane:
+  
+  \begin{center}
+   \begin{tabular}{| l | l | l |}
+    \hline
+     Nazwa                                          &  Rozmiar domyślny  &  Rozmiar po zmianie rozdzielczości\\
+     \textquotedblleft Cameraman\textquotedblright  &  $200\times 200$   &  $400\times 400$\\ 
+     \hline
+    \end{tabular}
+   \end{center}
+
+\end{document}
